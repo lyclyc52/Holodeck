@@ -10,7 +10,9 @@ import time
 import editdistance
 import matplotlib.pyplot as plt
 import numpy as np
-from langchain import PromptTemplate, OpenAI
+# from langchain import PromptTemplate, OpenAI
+from langchain_core.prompts import PromptTemplate
+from langchain_openai import ChatOpenAI
 from rtree import index
 from scipy.interpolate import interp1d
 from shapely.geometry import Polygon, Point, box, LineString
@@ -22,7 +24,7 @@ from ai2holodeck.generation.utils import get_bbox_dims
 
 
 class FloorObjectGenerator:
-    def __init__(self, object_retriever: ObjathorRetriever, llm: OpenAI):
+    def __init__(self, object_retriever: ObjathorRetriever, llm: ChatOpenAI):
         self.json_template = {
             "assetId": None,
             "id": None,
@@ -104,7 +106,7 @@ class FloorObjectGenerator:
             )
 
             if self.constraint_type == "llm":
-                constraint_plan = self.llm(constraint_prompt)
+                constraint_plan = self.llm.invoke(constraint_prompt).content
             elif self.constraint_type in ["middle", "edge"]:
                 constraint_plan = ""
                 for object_name in object_names:
@@ -171,7 +173,7 @@ class FloorObjectGenerator:
             ]
             all_is_placed = False
             while not all_is_placed:
-                completion_text = self.llm(baseline_prompt)
+                completion_text = self.llm.invoke(baseline_prompt).content
                 try:
                     completion_text = re.findall(
                         r"```(.*?)```", completion_text, re.DOTALL

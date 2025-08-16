@@ -3,14 +3,16 @@ import random
 
 import numpy as np
 from colorama import Fore
-from langchain import PromptTemplate, OpenAI
+# from langchain import PromptTemplate, OpenAI
+from langchain_core.prompts import PromptTemplate
+from langchain_openai import ChatOpenAI
 from shapely.geometry import LineString, Polygon, Point
 
 import ai2holodeck.generation.prompts as prompts
 
 
 class WallGenerator:
-    def __init__(self, llm: OpenAI):
+    def __init__(self, llm: ChatOpenAI):
         self.json_template = {
             "id": None,
             "roomId": None,
@@ -102,7 +104,7 @@ class WallGenerator:
         wall_height_prompt = self.wall_height_template.format(input=scene["query"])
 
         if "wall_height" not in scene:
-            wall_height = self.llm(wall_height_prompt).split("\n")[0].strip()
+            wall_height = self.llm.invoke(wall_height_prompt).content.split("\n")[0].strip()
 
             try:
                 wall_height = float(wall_height)

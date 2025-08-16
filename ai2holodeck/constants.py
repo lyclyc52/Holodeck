@@ -30,6 +30,7 @@ else:
     THOR_COMMIT_ID = "3213d486cd09bcbafce33561997355983bdf8d1a"
 
 # LLM_MODEL_NAME = "gpt-4-1106-preview"
-LLM_MODEL_NAME = "gpt-4o-2024-05-13"
+# LLM_MODEL_NAME = "gpt-4o-2024-05-13"
+LLM_MODEL_NAME = "claude-4-sonnet"
 
 DEBUGGING = os.environ.get("DEBUGGING", "0").lower() in ["1", "true", "True", "t", "T"]

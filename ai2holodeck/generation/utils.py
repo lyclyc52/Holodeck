@@ -6,9 +6,10 @@ from typing import Dict, Any
 import compress_json
 import numpy as np
 from PIL import Image
+from ai2thor.build import CloudRendering
 from ai2thor.controller import Controller
 from ai2thor.hooks.procedural_asset_hook import ProceduralAssetHookRunner
-from moviepy.editor import (
+from moviepy import (
     TextClip,
     CompositeVideoClip,
     concatenate_videoclips,
@@ -55,6 +56,7 @@ def get_top_down_frame(scene, objaverse_asset_dir, width=1024, height=1024):
             asset_symlink=True,
             verbose=True,
         ),
+        platform=CloudRendering
     )
 
     # Setup the top-down camera
@@ -116,6 +118,7 @@ def get_top_down_frame_ithor(scene, objaverse_asset_dir, width=1024, height=1024
             asset_symlink=True,
             verbose=True,
         ),
+        platform=CloudRendering
     )
 
     controller.reset(scene)
@@ -176,6 +179,7 @@ def get_room_images(scene, objaverse_asset_dir, width=1024, height=1024):
             asset_symlink=True,
             verbose=True,
         ),
+        platform=CloudRendering
     )
 
     wall_height = max([point["y"] for point in scene["walls"][0]["polygon"]])
@@ -250,6 +254,7 @@ def ithor_video(scene, objaverse_asset_dir, width, height, scene_type):
             asset_symlink=True,
             verbose=True,
         ),
+        platform=CloudRendering
     )
 
     event = controller.step(action="GetMapViewCameraProperties", raise_for_failure=True)
@@ -335,6 +340,7 @@ def room_video(scene, objaverse_asset_dir, width, height):
             asset_symlink=True,
             verbose=True,
         ),
+        platform=CloudRendering
     )
 
     try:

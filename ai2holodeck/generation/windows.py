@@ -7,14 +7,16 @@ import re
 import compress_json
 import numpy as np
 from colorama import Fore
-from langchain import PromptTemplate, OpenAI
+# from langchain import PromptTemplate, OpenAI
+from langchain_core.prompts import PromptTemplate
+from langchain_openai import ChatOpenAI
 
 import ai2holodeck.generation.prompts as prompts
 from ai2holodeck.constants import HOLODECK_BASE_DATA_DIR
 
 
 class WindowGenerator:
-    def __init__(self, llm: OpenAI):
+    def __init__(self, llm: ChatOpenAI):
         self.json_template = {
             "assetId": None,
             "id": None,
@@ -55,7 +57,7 @@ class WindowGenerator:
         )
 
         if "raw_window_plan" not in scene:
-            raw_window_plan = self.llm(window_prompt)
+            raw_window_plan = self.llm.invoke(window_prompt).content
         else:
             raw_window_plan = scene["raw_window_plan"]
 

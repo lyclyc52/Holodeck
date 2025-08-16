@@ -10,7 +10,9 @@ from typing import Dict, List
 import torch
 import torch.nn.functional as F
 from colorama import Fore
-from langchain import PromptTemplate, OpenAI
+# from langchain import PromptTemplate, OpenAI
+from langchain_core.prompts import PromptTemplate
+from langchain_openai import ChatOpenAI
 from shapely import Polygon
 
 import ai2holodeck.generation.prompts as prompts
@@ -30,7 +32,7 @@ EXPECTED_OBJECT_ATTRIBUTES = [
 
 
 class ObjectSelector:
-    def __init__(self, object_retriever: ObjathorRetriever, llm: OpenAI):
+    def __init__(self, object_retriever: ObjathorRetriever, llm: ChatOpenAI):
         # object retriever
         self.object_retriever = object_retriever
         self.database = object_retriever.database
@@ -60,7 +62,7 @@ class ObjectSelector:
 
         self.random_selection = False
         self.reuse_selection = False
-        self.multiprocessing = True
+        self.multiprocessing = False
 
     def select_objects(self, scene, additional_requirements="N/A"):
         rooms_types = [room["roomType"] for room in scene["rooms"]]
@@ -163,7 +165,7 @@ class ObjectSelector:
             .replace("REQUIREMENTS", additional_requirements)
         )
 
-        output_1 = self.llm(prompt_1).lower()
+        output_1 = self.llm.invoke(prompt_1).content.lower()
         plan_1 = self.extract_json(output_1)
 
         if plan_1 is None:
@@ -201,7 +203,7 @@ class ObjectSelector:
                 object_selection_1=output_1,
                 room=room_type,
             )
-            output_2 = self.llm(prompt_2).lower()
+            output_2 = self.llm.invoke(prompt_2).content.lower()
             plan_2 = self.extract_json(output_2)
 
             if plan_2 is None:

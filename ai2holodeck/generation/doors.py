@@ -8,7 +8,9 @@ import numpy as np
 import torch
 from PIL import Image
 from colorama import Fore
-from langchain import PromptTemplate, OpenAI
+# from langchain import PromptTemplate, OpenAI
+from langchain_core.prompts import PromptTemplate
+from langchain_openai import ChatOpenAI
 from tqdm import tqdm
 
 import ai2holodeck.generation.prompts as prompts
@@ -16,7 +18,7 @@ from ai2holodeck.constants import HOLODECK_BASE_DATA_DIR
 
 
 class DoorGenerator:
-    def __init__(self, clip_model, clip_preprocess, clip_tokenizer, llm: OpenAI):
+    def __init__(self, clip_model, clip_preprocess, clip_tokenizer, llm: ChatOpenAI):
         self.json_template = {
             "assetId": None,
             "id": None,
@@ -97,7 +99,7 @@ class DoorGenerator:
 
         # generate raw doorway plan if not exist
         if "raw_doorway_plan" not in scene:
-            raw_doorway_plan = self.llm(doorway_prompt)
+            raw_doorway_plan = self.llm.invoke(doorway_prompt).content
         else:
             raw_doorway_plan = scene["raw_doorway_plan"]
 

@@ -4,9 +4,11 @@ import random
 
 import torch
 import torch.nn.functional as F
+from ai2thor.build import CloudRendering
 from ai2thor.controller import Controller
 from ai2thor.hooks.procedural_asset_hook import ProceduralAssetHookRunner
-from langchain import OpenAI
+# from langchain import OpenAI
+from langchain_openai import ChatOpenAI
 from procthor.constants import FLOOR_Y
 from procthor.utils.types import Vector3
 
@@ -20,7 +22,7 @@ from ai2holodeck.generation.utils import (
 
 
 class SmallObjectGenerator:
-    def __init__(self, object_retriever: ObjathorRetriever, llm: OpenAI):
+    def __init__(self, object_retriever: ObjathorRetriever, llm: ChatOpenAI):
         self.llm = llm
         self.object_retriever = object_retriever
         self.database = object_retriever.database
@@ -39,6 +41,7 @@ class SmallObjectGenerator:
 
         self.used_assets = []
         self.reuse_assets = True
+        self.multiprocessing = False
 
     def generate_small_objects(self, scene, controller, receptacle_ids):
         object_selection_plan = scene["object_selection_plan"]
@@ -167,10 +170,16 @@ class SmallObjectGenerator:
             (receptacle, small_objects, receptacle2asset_id)
             for receptacle, small_objects in receptacle2small_object_plans.items()
         ]
-        pool = multiprocessing.Pool(processes=4)
-        results = pool.map(self.select_small_objects_per_receptacle, packed_args)
-        pool.close()
-        pool.join()
+        if self.multiprocessing:
+            pool = multiprocessing.Pool(processes=4)
+            results = pool.map(self.select_small_objects_per_receptacle, packed_args)
+            pool.close()
+            pool.join()
+        else:
+            results = [
+                self.select_small_objects_per_receptacle(args)
+                for args in packed_args
+            ]
 
         for result in results:
             receptacle2small_objects[result[0]] = result[1]
@@ -298,6 +307,7 @@ class SmallObjectGenerator:
                 asset_symlink=True,
                 verbose=True,
             ),
+            platform=CloudRendering
         )
         return controller
 

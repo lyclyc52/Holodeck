@@ -4,7 +4,8 @@ from typing import Optional, Dict, Any, Tuple
 
 import compress_json
 import open_clip
-from langchain.llms import OpenAI
+# from langchain.llms import OpenAI
+from langchain_openai import ChatOpenAI
 from sentence_transformers import SentenceTransformer
 from tqdm import tqdm
 
@@ -67,10 +68,16 @@ class Holodeck:
             os.environ["OPENAI_ORG"] = openai_org
 
         # initialize llm
-        self.llm = OpenAI(
-            model_name=LLM_MODEL_NAME,
+        # self.llm = OpenAI(
+        #     model_name=LLM_MODEL_NAME,
+        #     max_tokens=2048,
+        #     openai_api_key=openai_api_key,
+        # )
+        self.llm = ChatOpenAI(
+            model=LLM_MODEL_NAME,
             max_tokens=2048,
-            openai_api_key=openai_api_key,
+            api_key=openai_api_key,
+            base_url="https://genaiapi.cloudsway.net/v1/ai/qzZpcuWIVRuWVmxd",
         )
 
         # initialize CLIP
