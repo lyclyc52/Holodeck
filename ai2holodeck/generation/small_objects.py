@@ -307,6 +307,7 @@ class SmallObjectGenerator:
                 asset_symlink=True,
                 verbose=True,
             ),
+            headless=True,
             platform=CloudRendering
         )
         return controller
